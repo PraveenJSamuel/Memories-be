@@ -49,7 +49,7 @@ export const getPostsByCreator = async (req, res) => {
 
 export const getPost = async (req, res) => { 
     const { id } = req.params;
-
+    
     try {
         const post = await PostMessage.findById(id);
         
@@ -63,6 +63,7 @@ export const createPost = async (req, res) => {
     const post = req.body;
 
     const newPostMessage = new PostMessage({ ...post, creator: req.userId, createdAt: new Date().toISOString() })
+    console.log(newPostMessage)
 
     try {
         await newPostMessage.save();
@@ -105,11 +106,11 @@ export const likePost = async (req, res) => {
 
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No post with id: ${id}`);
     
-    const post = await PostMessage.findById(id);
+    const post = await PostMessage.findById(id);    
 
     const index = post.likes.findIndex((id) => id ===String(req.userId));
 
-    if (index === -1) {
+    if (index && index === -1) {
       post.likes.push(req.userId);
     } else {
       post.likes = post.likes.filter((id) => id !== String(req.userId));
@@ -126,7 +127,7 @@ export const commentPost = async (req, res) => {
 
     const post = await PostMessage.findById(id);
 
-    post.comments.push(value);
+    post.comments?.push(value);
 
     const updatedPost = await PostMessage.findByIdAndUpdate(id, post, { new: true });
 
